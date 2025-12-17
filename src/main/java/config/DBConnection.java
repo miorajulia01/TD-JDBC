@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private final String url = "jdbc:postgresql://localhost:5432/mini_dish_db";
-    private final String user = "mini_dish_db_manager";
-    private final String password = "123456";
+    private final String url = System.getenv("JDBC_URL");
+    private final String user = System.getenv("USERNAME");
+    private final String password = System.getenv("PASSWORD");
 
     public Connection getConnection() {
         Connection connection = null;
