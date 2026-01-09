@@ -12,11 +12,17 @@ CREATE TYPE dish_type AS ENUM (
     'DESSERT'
 );
 
-CREATE TABLE Dish (
-                      id int PRIMARY KEY,
-                      name VARCHAR(100) NOT NULL,
-                      dish_type dish_type NOT NULL
+CREATE TABLE Dish
+(
+    id int PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    dish_type dish_type NOT NULL
 );
+
+ALTER TABLE dish ADD COLUMN IF NOT EXISTS price NUMERIC(10, 2);
+UPDATE dish SET price = 2000.00 WHERE name = 'Salade fraîche';
+UPDATE dish SET price = 6000.00 WHERE name = 'Poulet grillé';
+
 
 CREATE TABLE Ingredient
 (

@@ -10,14 +10,14 @@ public class DBConnection {
     private final String password = System.getenv("PASSWORD");
 
     public Connection getConnection() {
-        Connection connection = null;
+        Connection conn = null;
         try {
-            connection = DriverManager.getConnection(url, user, password);
+            conn = DriverManager.getConnection(url, user, password);
             System.out.println("connexion OK!");
         }
         catch (SQLException e){
             System.out.println("Error" + e.getMessage());
         }
-        return connection;
+        return conn;
     }
 }
