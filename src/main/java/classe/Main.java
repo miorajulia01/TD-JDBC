@@ -1,164 +1,53 @@
 package classe;
 
+import classe.DataRetriever;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-
     public static void main(String[] args) {
-
         DataRetriever retriever = new DataRetriever();
 
-        System.out.println("TEST a) findDishById(1)");
-        System.out.println("Données initiales:");
-        System.out.println("- Dish ID 1: Salade fraîche (START)");
-        System.out.println("- Ingredient ID 1: Laitue (id_dish=1)");
-        System.out.println("- Ingredient ID 2: Tomate (id_dish=1)");
-
+        //a) test findDishByID
         Dish dish = retriever.findDishById(1);
+        System.out.println(dish.getName());
+        // ingredient qui le compose à faire: System.out.println(dish.setIngredients(dish.getIngredients()));
 
-        System.out.println("\nRésultat OBTENU:");
-        System.out.println("- Nom: " + dish.getName());
-        System.out.println("- Type: " + dish.getDishType());
-        System.out.println("- Nombre ingrédients: " + dish.getIngredients().size());
+        //test b)
 
-        if (dish.getIngredients().size() == 2) {
-            System.out.println("- Ingrédient 1: " + dish.getIngredients().get(0).getName());
-            System.out.println("- Ingrédient 2: " + dish.getIngredients().get(1).getName());
-        }
+        List<Ingredient> ingredientList = new ArrayList<>();
 
-        System.out.println("\nRésultat ATTENDU:");
-        System.out.println("- Salade fraîche avec 2 ingrédients (Laitue et Tomate)");
-        System.out.println("\n✓ TEST RÉUSSI si les deux ingrédients sont Laitue et Tomate");
-        System.out.println("\n" + "=".repeat(60) + "\n");
+        //test de createIngredient
+        System.out.println("Test de createIngredients");
+       //ingredient 1
+        Ingredient ing1 = new Ingredient();
+        //ing1.setId();
+        ing1.setName("fromage");
+        ing1.setPrice(1200.0);
+        ing1.setCategory(CategoryEnum.DAIRY);
 
+        //ingredient 2
+        Ingredient ing2 = new Ingredient();
+        ing2.setName("oignon");
+        ing2.setPrice(500.0);
+        ing2.setCategory(CategoryEnum.VEGETABLE);
 
-        System.out.println("TEST c) findIngredients(page=2, size=2)");
-        System.out.println("Données initiales (par ordre d'ID):");
-        System.out.println("1. Laitue (id_dish=1)");
-        System.out.println("2. Tomate (id_dish=1)");
-        System.out.println("3. Poulet (id_dish=2)");
-        System.out.println("4. Chocolat (id_dish=4)");
-        System.out.println("5. Beurre (id_dish=4)");
+        //ingredient 3
+        Ingredient ing3 = new Ingredient();
+        ing3.setName("laitue");
+        ing3.setPrice(2000.0);
+        ing3.setCategory(CategoryEnum.VEGETABLE);
 
-        System.out.println("\nCalcul pagination:");
-        System.out.println("- Page 1 (offset 0): Laitue, Tomate");
-        System.out.println("- Page 2 (offset 2): Poulet, Chocolat");
-        System.out.println("- Page 3 (offset 4): Beurre");
-
-        List<Ingredient> ingredients = retriever.findIngredients(2, 2);
-
-        System.out.println("\nRésultat OBTENU (" + ingredients.size() + " ingrédients):");
-        for (int i = 0; i < ingredients.size(); i++) {
-            System.out.println((i+1) + ". " + ingredients.get(i).getName());
-        }
-
-        System.out.println("\nRésultat ATTENDU:");
-        System.out.println("- Ingrédients Poulet, Chocolat");
-
-        if (ingredients.size() == 2 &&
-                ingredients.get(0).getName().equals("Poulet") &&
-                ingredients.get(1).getName().equals("Chocolat")) {
-            System.out.println("✓ TEST RÉUSSI");
-        } else {
-            System.out.println("✗ TEST ÉCHOUÉ - Vérifiez votre requête SQL de pagination");
-        }
-
-        System.out.println("\n" + "=".repeat(60) + "\n");
+        //liste attendu/le type de retour pour mettre les ingredients
 
 
-        System.out.println("TEST e) findDishsByIngredientName(\"eur\")");
-        System.out.println("Logique de recherche:");
-        System.out.println("1. Cherche les plats dont un ingrédient contient 'eur'");
-        System.out.println("2. Seul 'Beurre' contient 'eur'");
-        System.out.println("3. Beurre est dans le plat ID 4: Gâteau au chocolat");
+        //ajout des ingredients dans la liste
+        ingredientList.add(ing1);
 
-        List<Dish> dishes = retriever.findDishsByIngredientName("eur");
-
-        System.out.println("\nRésultat OBTENU (" + dishes.size() + " plat(s)):");
-        for (Dish d : dishes) {
-            System.out.println("- " + d.getName());
-        }
-
-        System.out.println("\nRésultat ATTENDU:");
-        System.out.println("- Plat - Gâteau au chocolat");
-
-        if (dishes.size() == 1 && dishes.get(0).getName().contains("chocolat")) {
-            System.out.println("✓ TEST RÉUSSI");
-        } else {
-            System.out.println("✗ TEST ÉCHOUÉ - Vérifiez votre requête avec LIKE");
-        }
-
-        System.out.println("\n" + "=".repeat(60) + "\n");
-
-
-        System.out.println("TEST h) findIngredientsByCriteria(\"cho\", null, \"gâteau\", 1, 10)");
-        System.out.println("Logique de recherche:");
-        System.out.println("1. Ingredient name LIKE '%cho%' → 'Chocolat' correspond");
-        System.out.println("2. Dish name LIKE '%gâteau%' → 'Gâteau au chocolat' correspond");
-        System.out.println("3. Chocolat est dans Gâteau au chocolat → DOIT être retourné");
-
-        List<Ingredient> result = retriever.findIngredientsByCriteria("cho", null, "gâteau", 1, 10);
-
-        System.out.println("\nRésultat OBTENU (" + result.size() + " ingrédient(s)):");
-        for (Ingredient ing : result) {
-            System.out.println("- " + ing.getName());
-        }
-
-        System.out.println("\nRésultat ATTENDU:");
-        System.out.println("- Chocolat");
-
-        if (result.size() == 1 && result.get(0).getName().equals("Chocolat")) {
-            System.out.println("✓ TEST RÉUSSI");
-        } else {
-            System.out.println("✗ TEST ÉCHOUÉ - Vérifiez votre JOIN et vos conditions WHERE");
-        }
-
-        System.out.println("=== Test findDishById ===");
-        Dish dish1 = retriever.findDishById(1);
-        System.out.println("Plat trouvé : " + dish1);
-        try {
-            System.out.println("Marge brute : " + dish1.getGrossMargin());
-        } catch (IllegalStateException e) {
-            System.out.println("Erreur : " + e.getMessage());
-        }
-
-        Dish dish2 = retriever.findDishById(2);
-        System.out.println("\nPlat trouvé : " + dish2);
-        try {
-            System.out.println("Marge brute : " + dish2.getGrossMargin());
-        } catch (IllegalStateException e) {
-            System.out.println("Erreur : " + e.getMessage());
-        }
-
-        System.out.println("\n=== Test saveDish (création) ===");
-        Dish newDish = new Dish(01, "Salad russe", "Start", [pomme de terre, betterave]);
-        Dish savedDish = retriever.saveDish(newDish);
-        System.out.println("Plat créé : " + savedDish);
-        try {
-            System.out.println("Marge brute : " + savedDish.getGrossMargin());
-        } catch (IllegalStateException e) {
-            System.out.println("Erreur : " + e.getMessage());
-        }
-
-        System.out.println("\n=== Test saveDish (mise à jour prix) ===");
-        Dish dishToUpdate = retriever.findDishById(2);
-        dishToUpdate.setPrice(10.0);
-        retriever.saveDish(dishToUpdate);
-        System.out.println("Plat après mise à jour prix : " + dishToUpdate);
-        try {
-            System.out.println("Marge brute : " + dishToUpdate.getGrossMargin());
-        } catch (IllegalStateException e) {
-            System.out.println("Erreur : " + e.getMessage());
-        }
-
-        System.out.println("\n=== Vérification findDishById après mise à jour ===");
-        Dish updated = retriever.findDishById(2);
-        System.out.println("Plat relu : " + updated);
-        try {
-            System.out.println("Marge brute : " + updated.getGrossMargin());
-        } catch (IllegalStateException e) {
-            System.out.println("Erreur : " + e.getMessage());
-        }
+        ingredientList.add(ing2);
+        ingredientList.add(ing3);
     }
+
+
 }

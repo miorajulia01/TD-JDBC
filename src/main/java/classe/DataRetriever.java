@@ -130,7 +130,7 @@ public class DataRetriever {
                         insertPs.setDouble(2, ing.getPrice());
                         insertPs.setString(3, ing.getCategory().name());
 
-                        // Gérer l'association avec un plat (peut être null)
+
                         if (ing.getDish() != null) {
                             insertPs.setInt(4, ing.getDish().getId());
                         } else {
