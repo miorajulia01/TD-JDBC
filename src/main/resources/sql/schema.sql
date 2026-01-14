@@ -20,6 +20,7 @@ CREATE TABLE Dish
 );
 
 ALTER TABLE dish ADD COLUMN IF NOT EXISTS price NUMERIC(10, 2);
+--à déplacer l'insertion dans data
 UPDATE dish SET price = 2000.00 WHERE name = 'Salade fraîche';
 UPDATE dish SET price = 6000.00 WHERE name = 'Poulet grillé';
 
