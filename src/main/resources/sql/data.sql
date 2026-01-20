@@ -13,4 +13,12 @@ INSERT INTO Ingredient (id, name, price, category, id_dish) VALUES
 (4, 'Chocolat', 3000.00,OTHER, 4),
 (5, 'Beurre', 2500.00,DAIRY, 4);
 
+update dish
+set price = 2000.0
+where id = 1;
+
+update dish
+set price = 6000.0
+where id = 2;
+
 
