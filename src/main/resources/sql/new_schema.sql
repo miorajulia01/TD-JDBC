@@ -20,7 +20,7 @@ CREATE  TYPE unit_type AS ENUM (
 
 CREATE TABLE Dish
 (
-    id SERIAL PRIMARY KEY,
+    id serial PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     dish_type dish_type NOT NULL,
     price numeric (10, 2)
@@ -29,7 +29,7 @@ CREATE TABLE Dish
 
 CREATE TABLE Ingredient
 (
-    id       int PRIMARY KEY,
+    id       serial PRIMARY KEY,
     name     VARCHAR(100)        NOT NULL,
     price    NUMERIC(6, 2)       NOT NULL,
     category ingredient_category NOT NULL
