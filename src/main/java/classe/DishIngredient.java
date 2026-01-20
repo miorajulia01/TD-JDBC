@@ -6,24 +6,20 @@ public class DishIngredient {
         private Integer idIngredient;
         private Double quantityRequired;
         private UnitType unit;
-        private Ingredient ingredient;  // Pour navigation (optionnel)
+        private Ingredient ingredient;
 
-        // ────────────────────────────────────────────────────────────────
-        // Constructeurs
-        // ────────────────────────────────────────────────────────────────
+
         public DishIngredient() {}
 
-        public DishIngredient(Integer idDish, Integer idIngredient,
-                              Double quantityRequired, UnitType unit) {
+        public DishIngredient(Integer idDish, Integer idIngredient, Double quantityRequired, UnitType unit) {
             this.idDish = idDish;
             this.idIngredient = idIngredient;
             this.quantityRequired = quantityRequired;
             this.unit = unit;
         }
 
-        // Constructeur avec ingrédient complet
-        public DishIngredient(Integer idDish, Ingredient ingredient,
-                              Double quantityRequired, UnitType unit) {
+
+        public DishIngredient(Integer idDish, Ingredient ingredient, Double quantityRequired, UnitType unit) {
             this.idDish = idDish;
             this.idIngredient = ingredient != null ? ingredient.getId() : null;
             this.ingredient = ingredient;
@@ -31,9 +27,7 @@ public class DishIngredient {
             this.unit = unit;
         }
 
-        // ────────────────────────────────────────────────────────────────
-        // Getters et Setters (COMPLETS - toutes les méthodes manquantes)
-        // ────────────────────────────────────────────────────────────────
+
         public Integer getId() {
             return id;
         }
@@ -85,16 +79,12 @@ public class DishIngredient {
             }
         }
 
-        // ────────────────────────────────────────────────────────────────
-        // Méthode utilitaire pour obtenir le nom de l'ingrédient
-        // ────────────────────────────────────────────────────────────────
+
         public String getIngredientName() {
             return ingredient != null ? ingredient.getName() : null;
         }
 
-        // ────────────────────────────────────────────────────────────────
-        // Méthode utilitaire pour obtenir le prix unitaire
-        // ────────────────────────────────────────────────────────────────
+
         public Double getIngredientPrice() {
             return ingredient != null ? ingredient.getPrice() : null;
         }

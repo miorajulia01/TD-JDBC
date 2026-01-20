@@ -8,66 +8,69 @@ public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
-    private Double Price;
+    private Double price;
     private List<DishIngredient> dishIngredients;
 
-    // ────────────────────────────────────────────────────────────────
-    // Constructeurs
-    // ────────────────────────────────────────────────────────────────
+
     public Dish() {
         this.dishIngredients = new ArrayList<>();
     }
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, Double sellingPrice) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double price) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
-        this.Price = sellingPrice;
+        this.price = price;
         this.dishIngredients = new ArrayList<>();
     }
 
-    // ────────────────────────────────────────────────────────────────
-    // Getters et Setters
-    // ────────────────────────────────────────────────────────────────
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Integer getId() {
+        return id;
+    }
 
-    public DishTypeEnum getDishType() { return dishType; }
-    public void setDishType(DishTypeEnum dishType) { this.dishType = dishType; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public Double getSellingPrice() { return Price; }
-    public void setSellingPrice(Double sellingPrice) { this.Price = sellingPrice; }
+    public String getName() {
+        return name;
+    }
 
-    public List<DishIngredient> getDishIngredients() { return dishIngredients; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public DishTypeEnum getDishType() {
+        return dishType;
+    }
+
+    public void setDishType(DishTypeEnum dishType) {
+        this.dishType = dishType;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public List<DishIngredient> getDishIngredients() {
+        return dishIngredients;
+    }
+
     public void setDishIngredients(List<DishIngredient> dishIngredients) {
         this.dishIngredients = dishIngredients != null ? dishIngredients : new ArrayList<>();
     }
 
-    // ────────────────────────────────────────────────────────────────
-    // Méthode de compatibilité : getPrice() retourne sellingPrice
-    // ────────────────────────────────────────────────────────────────
-    public Double getPrice() {
-        return Price;
-    }
 
-    public void setPrice(Double price) {
-        this.Price = price;
-    }
-
-    // ────────────────────────────────────────────────────────────────
-    // Méthode de compatibilité : getIngredients()
-    // Extraie les ingrédients purs de dishIngredients
-    // ────────────────────────────────────────────────────────────────
     public List<Ingredient> getIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
         if (dishIngredients != null) {
             for (DishIngredient di : dishIngredients) {
-                if (di.getIngredient() != null) {
-                    // On met à jour la référence bidirectionnelle si besoin
-                    di.getIngredient().setDish(this);
+                if (di != null && di.getIngredient() != null) {
                     ingredients.add(di.getIngredient());
                 }
             }
@@ -81,23 +84,21 @@ public class Dish {
             return;
         }
 
-        // Conversion de List<Ingredient> en List<DishIngredient>
         List<DishIngredient> newDishIngredients = new ArrayList<>();
         for (Ingredient ingredient : ingredients) {
-            DishIngredient di = new DishIngredient();
-            di.setIdIngredient(ingredient.getId());
-            di.setIngredient(ingredient);
-            // On utilise 1.0 comme quantité par défaut (à ajuster selon besoins)
-            di.setQuantityRequired(1.0);
-            di.setUnit(UnitType.PCS);
-            newDishIngredients.add(di);
+            if (ingredient != null) {
+                DishIngredient di = new DishIngredient();
+                di.setIdIngredient(ingredient.getId());
+                di.setIngredient(ingredient);
+                di.setQuantityRequired(1.0);
+                di.setUnit(UnitType.PCS);
+                newDishIngredients.add(di);
+            }
         }
         this.dishIngredients = newDishIngredients;
     }
 
-    // ────────────────────────────────────────────────────────────────
-    // getDishCost() - Calcule le coût avec quantités
-    // ────────────────────────────────────────────────────────────────
+
     public Double getDishCost() {
         double totalCost = 0.0;
 
@@ -106,37 +107,66 @@ public class Dish {
         }
 
         for (DishIngredient dishIngredient : dishIngredients) {
-            Ingredient ingredient = dishIngredient.getIngredient();
-            if (ingredient != null &&
-                    ingredient.getPrice() != null &&
-                    dishIngredient.getQuantityRequired() != null) {
-                totalCost += ingredient.getPrice() * dishIngredient.getQuantityRequired();
+            if (dishIngredient != null) {
+                Ingredient ingredient = dishIngredient.getIngredient();
+                Double ingredientPrice = ingredient != null ? ingredient.getPrice() : null;
+                Double quantity = dishIngredient.getQuantityRequired();
+
+                if (ingredientPrice != null && quantity != null) {
+                    totalCost += ingredientPrice * quantity;
+                }
             }
         }
         return totalCost;
     }
 
-
     public Double getGrossMargin() {
-        if (Price == null) {
+        if (price == null) {
             throw new IllegalStateException("Impossible de calculer la marge : " +
                     "le prix de vente n'est pas encore fixé.");
         }
-        return Price - getDishCost();
+        return price - getDishCost();
     }
+
+
+    public void addIngredient(Ingredient ingredient, Double quantity, UnitType unit) {
+        if (ingredient == null) return;
+
+        DishIngredient di = new DishIngredient();
+        di.setIdIngredient(ingredient.getId());
+        di.setIngredient(ingredient);
+        di.setQuantityRequired(quantity);
+        di.setUnit(unit);
+
+        if (dishIngredients == null) {
+            dishIngredients = new ArrayList<>();
+        }
+        dishIngredients.add(di);
+    }
+
+
+    public DishIngredient findDishIngredient(Integer ingredientId) {
+        if (dishIngredients == null || ingredientId == null) return null;
+
+        for (DishIngredient di : dishIngredients) {
+            if (di != null && ingredientId.equals(di.getIdIngredient())) {
+                return di;
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Dish dish = (Dish) o;
-        return Objects.equals(id, dish.id) &&
-                Objects.equals(name, dish.name) &&
-                dishType == dish.dishType;
+        return Objects.equals(id, dish.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, dishType);
+        return Objects.hash(id);
     }
 
     @Override
@@ -145,8 +175,9 @@ public class Dish {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", dishType=" + dishType +
-                ", sellingPrice=" + Price +
-                ", dishIngredientsCount=" + (dishIngredients != null ? dishIngredients.size() : 0) +
+                ", price=" + price +
+                ", ingredientsCount=" + (dishIngredients != null ? dishIngredients.size() : 0) +
+                ", dishCost=" + getDishCost() +
                 '}';
     }
 }
