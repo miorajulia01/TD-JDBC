@@ -12,10 +12,9 @@ public class DataRetriever {
         this.dbConnection = new DBConnection();
     }
 
-    // ============ 1. findDishById ============
+
     public Dish findDishById(Integer id) {
         try (Connection conn = dbConnection.getConnection()) {
-            // 1. Récupérer le plat
             String dishSql = "SELECT id, name, dish_type, price FROM dish WHERE id = ?";
             Dish dish = null;
 
@@ -34,7 +33,6 @@ public class DataRetriever {
                 }
             }
 
-            // 2. Récupérer les ingrédients avec quantités (ManyToMany)
             if (dish != null) {
                 String ingredientsSql = """
                     SELECT i.id, i.name, i.price, i.category, 
@@ -78,7 +76,7 @@ public class DataRetriever {
         }
     }
 
-    // ============ 2. findIngredients ============
+
     public List<Ingredient> findIngredients(int page, int size) {
         String sql = "SELECT id, name, price, category FROM ingredient ORDER BY id LIMIT ? OFFSET ?";
         List<Ingredient> ingredients = new ArrayList<>();
@@ -106,7 +104,7 @@ public class DataRetriever {
         return ingredients;
     }
 
-    // ============ 3. createIngredients ============
+
     public List<Ingredient> createIngredients(List<Ingredient> newIngredients) {
         if (newIngredients == null || newIngredients.isEmpty()) {
             return new ArrayList<>();
@@ -131,7 +129,7 @@ public class DataRetriever {
                     }
                 }
 
-                // Insérer
+
                 List<Ingredient> saved = new ArrayList<>();
                 try (PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
                     for (Ingredient ing : newIngredients) {
@@ -140,7 +138,7 @@ public class DataRetriever {
                         ps.setString(3, ing.getCategory().name());
                         ps.executeUpdate();
 
-                        // Récupérer l'ID généré
+
                         ResultSet rs = ps.getGeneratedKeys();
                         if (rs.next()) {
                             ing.setId(rs.getInt(1));
@@ -162,14 +160,13 @@ public class DataRetriever {
         }
     }
 
-    // ============ 4. saveDish ============
+
     public Dish saveDish(Dish dishToSave) {
         try (Connection conn = dbConnection.getConnection()) {
             conn.setAutoCommit(false);
 
             Integer dishId;
 
-            // 1. Insérer ou mettre à jour le plat
             if (dishToSave.getId() == null) {
                 // INSERT
                 String insertSql = "INSERT INTO dish(name, dish_type, price) VALUES (?, ?, ?)";
@@ -199,14 +196,14 @@ public class DataRetriever {
                 }
             }
 
-            // 2. Supprimer anciennes associations
+
             String deleteSql = "DELETE FROM dish_ingredient WHERE id_dish = ?";
             try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
                 ps.setInt(1, dishId);
                 ps.executeUpdate();
             }
 
-            // 3. Ajouter nouvelles associations
+
             if (dishToSave.getDishIngredients() != null && !dishToSave.getDishIngredients().isEmpty()) {
                 String insertDiSql = "INSERT INTO dish_ingredient(id_dish, id_ingredient, quantity_required, unit) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(insertDiSql)) {
@@ -229,7 +226,6 @@ public class DataRetriever {
         }
     }
 
-    // ============ 5. findDishsByIngredientName ============
     public List<Dish> findDishsByIngredientName(String ingredientName) {
         String sql = """
             SELECT DISTINCT d.id, d.name, d.dish_type, d.price
@@ -263,7 +259,7 @@ public class DataRetriever {
         return dishes;
     }
 
-    // ============ 6. findIngredientsByCriteria ============
+
     public List<Ingredient> findIngredientsByCriteria(
             String ingredientName,
             CategoryEnum category,
@@ -271,7 +267,6 @@ public class DataRetriever {
             int page,
             int size) {
 
-        // Construire la requête dynamiquement
         StringBuilder sql = new StringBuilder("""
             SELECT DISTINCT i.id, i.name, i.price, i.category, d.name as dish_name
             FROM ingredient i
