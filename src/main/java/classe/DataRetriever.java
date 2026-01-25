@@ -17,20 +17,21 @@ public class DataRetriever {
 
     public Dish findDishById(Integer id) {
         try (Connection conn = dbConnection.getConnection()) {
-
             String dishSql = "SELECT id, name, dish_type, price FROM dish WHERE id = ?";
             Dish dish = null;
 
             try (PreparedStatement ps = conn.prepareStatement(dishSql)) {
-                ps.setInt(1, id); // On remplace le ? par l'ID
+                ps.setInt(1, id);
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
                     dish = new Dish();
                     dish.setId(rs.getInt("id"));
                     dish.setName(rs.getString("name"));
-                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
-                    dish.setPrice(rs.getObject("price") == null ? null : rs.getDouble("price"));
+                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));java.math.BigDecimal exactPrice = rs.getBigDecimal("price");
+
+                    // Si ce n'est pas null, on le transforme en Double pour ton objet Dish
+                    dish.setPrice(exactPrice != null ? exactPrice.doubleValue() : null);
                 } else {
                     return null;
                 }
@@ -216,10 +217,10 @@ public class DataRetriever {
             }
 
             conn.commit();
-            return findDishById(dishId);
+            return dishToSave;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur dans saveDish : " + e.getMessage(), e);
+            throw new RuntimeException("Erreur dans saveDish : " + e.getMessage());
         }
     }
 
@@ -353,7 +354,7 @@ public class DataRetriever {
                 }
             }
 
-            if (!toSave.getStockMovementList().isEmpty()) {
+            if (toSave.getStockMovementList() != null && !toSave.getStockMovementList().isEmpty()) {
                 String insertMovementSql = """
                 INSERT INTO stock_movement (id, id_ingredient, quantity, type, unit, creation_datetime)
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -361,7 +362,7 @@ public class DataRetriever {
             """;
                 try (PreparedStatement ps = conn.prepareStatement(insertMovementSql)) {
                     for (StockMovement sm : toSave.getStockMovementList()) {
-                        ps.setInt(1, sm.getId() != null ? sm.getId() : 0);  // ID explicit, 0 si new (mais SERIAL ignore si conflict)
+                        ps.setObject(1, sm.getId());
                         ps.setInt(2, ingredientId);
                         ps.setDouble(3, sm.getValue().getQuantity());
                         ps.setString(4, sm.getType().name());

@@ -54,7 +54,7 @@ public class Dish {
     }
 
     public void setPrice(Double price) {
-        this.sellingPrice = sellingPrice;
+        this.sellingPrice = price;
     }
 
     public List<DishIngredient> getDishIngredients() {
