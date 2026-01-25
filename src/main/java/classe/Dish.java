@@ -8,7 +8,7 @@ public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
-    private Double price;
+    private Double sellingPrice;
     private List<DishIngredient> dishIngredients;
 
 
@@ -16,11 +16,11 @@ public class Dish {
         this.dishIngredients = new ArrayList<>();
     }
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, Double price) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double sellingPrice) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
-        this.price = price;
+        this.sellingPrice = sellingPrice;
         this.dishIngredients = new ArrayList<>();
     }
 
@@ -50,11 +50,11 @@ public class Dish {
     }
 
     public Double getPrice() {
-        return price;
+        return sellingPrice;
     }
 
     public void setPrice(Double price) {
-        this.price = price;
+        this.sellingPrice = sellingPrice;
     }
 
     public List<DishIngredient> getDishIngredients() {
@@ -88,7 +88,6 @@ public class Dish {
         for (Ingredient ingredient : ingredients) {
             if (ingredient != null) {
                 DishIngredient di = new DishIngredient();
-                di.setIdIngredient(ingredient.getId());
                 di.setIngredient(ingredient);
                 di.setQuantityRequired(1.0);
                 di.setUnit(UnitType.PCS);
@@ -121,11 +120,11 @@ public class Dish {
     }
 
     public Double getGrossMargin() {
-        if (price == null) {
+        if (sellingPrice == null) {
             throw new IllegalStateException("Impossible de calculer la marge : " +
                     "le prix de vente n'est pas encore fixé.");
         }
-        return price - getDishCost();
+        return sellingPrice - getDishCost();
     }
 
 
@@ -133,7 +132,6 @@ public class Dish {
         if (ingredient == null) return;
 
         DishIngredient di = new DishIngredient();
-        di.setIdIngredient(ingredient.getId());
         di.setIngredient(ingredient);
         di.setQuantityRequired(quantity);
         di.setUnit(unit);
@@ -148,12 +146,11 @@ public class Dish {
     public DishIngredient findDishIngredient(Integer ingredientId) {
         if (dishIngredients == null || ingredientId == null) return null;
 
-        for (DishIngredient di : dishIngredients) {
-            if (di != null && ingredientId.equals(di.getIdIngredient())) {
-                return di;
-            }
-        }
-        return null;
+        return dishIngredients.stream()
+                .filter(di -> di != null && di.getIngredient() != null)
+                .filter(di -> ingredientId.equals(di.getIngredient().getId()))
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -175,7 +172,7 @@ public class Dish {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", dishType=" + dishType +
-                ", price=" + price +
+                ", price=" + sellingPrice +
                 ", ingredientsCount=" + (dishIngredients != null ? dishIngredients.size() : 0) +
                 ", dishCost=" + getDishCost() +
                 '}';

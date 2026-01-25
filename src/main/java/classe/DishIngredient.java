@@ -1,103 +1,84 @@
 package classe;
 
 public class DishIngredient {
-        private Integer id;
-        private Integer idDish;
-        private Integer idIngredient;
-        private Double quantityRequired;
-        private UnitType unit;
-        private Ingredient ingredient;
 
+    private Integer id;
+    private Dish dish;
+    private Ingredient ingredient;
+    private Double quantityRequired;
+    private UnitType unit;
 
-        public DishIngredient() {}
+    public DishIngredient() {}
 
-        public DishIngredient(Integer idDish, Integer idIngredient, Double quantityRequired, UnitType unit) {
-            this.idDish = idDish;
-            this.idIngredient = idIngredient;
-            this.quantityRequired = quantityRequired;
-            this.unit = unit;
-        }
+    public DishIngredient(Dish dish, Ingredient ingredient, Double quantityRequired, UnitType unit) {
+        this.dish = dish;
+        this.ingredient = ingredient;
+        this.quantityRequired = quantityRequired;
+        this.unit = unit;
+    }
 
+    public Integer getId() {
+        return id;
+    }
 
-        public DishIngredient(Integer idDish, Ingredient ingredient, Double quantityRequired, UnitType unit) {
-            this.idDish = idDish;
-            this.idIngredient = ingredient != null ? ingredient.getId() : null;
-            this.ingredient = ingredient;
-            this.quantityRequired = quantityRequired;
-            this.unit = unit;
-        }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
+    public Dish getDish() {
+        return dish;
+    }
 
-        public Integer getId() {
-            return id;
-        }
+    public void setDish(Dish dish) {
+        this.dish = dish;
+    }
 
-        public void setId(Integer id) {
-            this.id = id;
-        }
+    public Ingredient getIngredient() {
+        return ingredient;
+    }
 
-        public Integer getIdDish() {
-            return idDish;
-        }
+    public void setIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
+    }
 
-        public void setIdDish(Integer idDish) {
-            this.idDish = idDish;
-        }
+    public Double getQuantityRequired() {
+        return quantityRequired;
+    }
 
-        public Integer getIdIngredient() {
-            return idIngredient;
-        }
+    public void setQuantityRequired(Double quantityRequired) {
+        this.quantityRequired = quantityRequired;
+    }
 
-        public void setIdIngredient(Integer idIngredient) {
-            this.idIngredient = idIngredient;
-        }
+    public UnitType getUnit() {
+        return unit;
+    }
 
-        public Double getQuantityRequired() {
-            return quantityRequired;
-        }
+    public void setUnit(UnitType unit) {
+        this.unit = unit;
+    }
 
-        public void setQuantityRequired(Double quantityRequired) {
-            this.quantityRequired = quantityRequired;
-        }
+    // ---- Méthodes utiles ----
+    public Integer getIngredientId() {
+        return ingredient != null ? ingredient.getId() : null;
+    }
 
-        public UnitType getUnit() {
-            return unit;
-        }
+    public String getIngredientName() {
+        return ingredient != null ? ingredient.getName() : null;
+    }
 
-        public void setUnit(UnitType unit) {
-            this.unit = unit;
-        }
+    public Double getIngredientPrice() {
+        return ingredient != null ? ingredient.getPrice() : null;
+    }
 
-        public Ingredient getIngredient() {
-            return ingredient;
-        }
-
-        public void setIngredient(Ingredient ingredient) {
-            this.ingredient = ingredient;
-            if (ingredient != null && this.idIngredient == null) {
-                this.idIngredient = ingredient.getId();
-            }
-        }
-
-
-        public String getIngredientName() {
-            return ingredient != null ? ingredient.getName() : null;
-        }
-
-
-        public Double getIngredientPrice() {
-            return ingredient != null ? ingredient.getPrice() : null;
-        }
-
-        @Override
-        public String toString() {
-            return "DishIngredient{" +
-                    "id=" + id +
-                    ", idDish=" + idDish +
-                    ", idIngredient=" + idIngredient +
-                    ", quantityRequired=" + quantityRequired +
-                    ", unit=" + unit +
-                    ", ingredientName=" + getIngredientName() +
-                    '}';
-        }
+    @Override
+    public String toString() {
+        return "DishIngredient{" +
+                "id=" + id +
+                ", dish=" + dish +
+                ", ingredient=" + ingredient +
+                ", quantityRequired=" + quantityRequired +
+                ", unit=" + unit +
+                '}';
+    }
 }
+

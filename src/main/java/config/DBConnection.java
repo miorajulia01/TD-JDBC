@@ -5,10 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-
     public Connection getConnection() {
         try {
-            String jdbcURl = System.getenv("JDBC_URl");
+            String jdbcURl = System.getenv("JDBC_URL");
             String user = System.getenv("USER");
             String password = System.getenv("PASSWORD");
             return DriverManager.getConnection(jdbcURl, user, password);

@@ -1,9 +1,9 @@
 package classe;
 
 public enum UnitType {
-    PCS("Pièces"),   // Pour les items comptés (laitue, œufs)
-    KG("Kilogramme"), // Pour les solides vendus au poids (tomates, poulet)
-    L("Litre");       // Pour les liquides (huile, lait)
+    PCS("Pièces"),
+    KG("Kilogramme"),
+    L("Litre");
 
     private final String label;
 
@@ -15,7 +15,7 @@ public enum UnitType {
         return label;
     }
 
-    // Méthode utilitaire pour convertir depuis String
+
     public static UnitType fromString(String text) {
         if (text != null) {
             for (UnitType unit : UnitType.values()) {
