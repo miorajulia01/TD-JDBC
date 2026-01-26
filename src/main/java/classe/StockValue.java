@@ -2,34 +2,21 @@ package classe;
 
 public class StockValue {
     private double quantity;
-    private String unit;
+    private UnitType unit; // Corrigé : Utilise l'Enum UnitType
 
-    public StockValue(double quantity, String unit) {
+    public StockValue(double quantity, UnitType unit) {
         this.quantity = quantity;
         this.unit = unit;
     }
 
-    public double getQuantity() {
-        return quantity;
-    }
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
+    public UnitType getUnit() { return unit; }
+    public void setUnit(UnitType unit) { this.unit = unit; }
 
     @Override
     public String toString() {
-        return "StockValue{" +
-                "quantity=" + quantity +
-                ", unit='" + unit + '\'' +
-                '}';
+        return "StockValue{quantity=" + quantity + ", unit=" + unit + "}";
     }
 }

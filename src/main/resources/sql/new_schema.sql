@@ -51,6 +51,20 @@ CREATE TABLE stock_movement (
     id_ingredient INTEGER NOT NULL REFERENCES ingredient(id) ON DELETE CASCADE,
     quantity NUMERIC(10, 2) NOT NULL,
     type movement_type NOT NULL,
-    unit VARCHAR(10) NOT NULL DEFAULT 'KG',
+    unit unit_type NOT NULL,
     creation_datetime TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "order" (
+    id SERIAL PRIMARY KEY,
+    reference VARCHAR(20) NOT NULL UNIQUE,
+    creation_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE dish_order (
+    id SERIAL PRIMARY KEY,
+    id_order INTEGER NOT NULL REFERENCES "order"(id) ON DELETE CASCADE,
+    id_dish INTEGER NOT NULL REFERENCES dish(id),
+    quantity INTEGER NOT NULL CHECK (quantity > 0)
 );

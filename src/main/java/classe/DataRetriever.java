@@ -28,10 +28,9 @@ public class DataRetriever {
                     dish = new Dish();
                     dish.setId(rs.getInt("id"));
                     dish.setName(rs.getString("name"));
-                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));java.math.BigDecimal exactPrice = rs.getBigDecimal("price");
-
-                    // Si ce n'est pas null, on le transforme en Double pour ton objet Dish
-                    dish.setPrice(exactPrice != null ? exactPrice.doubleValue() : null);
+                    dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                    double price = rs.getDouble("price");
+                    dish.setPrice(rs.wasNull() ? null : price);
                 } else {
                     return null;
                 }
@@ -326,62 +325,57 @@ public class DataRetriever {
     public Ingredient saveIngredient(Ingredient toSave) {
         try (Connection conn = dbConnection.getConnection()) {
             conn.setAutoCommit(false);
-
             Integer ingredientId;
+
+            // Étape 1 : Sauvegarde de l'ingrédient
             if (toSave.getId() == null) {
-                String insertSql = "INSERT INTO ingredient(name, price, category) VALUES (?, ?, ?) RETURNING id";
-                try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                String sql = "INSERT INTO ingredient(name, price, category) VALUES (?, ?, ?::ingredient_category) RETURNING id";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, toSave.getName());
                     ps.setDouble(2, toSave.getPrice());
                     ps.setString(3, toSave.getCategory().name());
                     ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        ingredientId = rs.getInt("id");
-                        toSave.setId(ingredientId);
-                    } else {
-                        throw new RuntimeException("Erreur insertion ingrédient");
-                    }
+                    if (rs.next()) toSave.setId(rs.getInt(1));
                 }
             } else {
-                ingredientId = toSave.getId();
-                String updateSql = "UPDATE ingredient SET name = ?, price = ?, category = ? WHERE id = ?";
-                try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                String sql = "UPDATE ingredient SET name=?, price=?, category=?::ingredient_category WHERE id=?";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, toSave.getName());
                     ps.setDouble(2, toSave.getPrice());
                     ps.setString(3, toSave.getCategory().name());
-                    ps.setInt(4, ingredientId);
+                    ps.setInt(4, toSave.getId());
                     ps.executeUpdate();
                 }
             }
+            ingredientId = toSave.getId();
 
+            // Étape 2 : Sauvegarde des mouvements de stock [cite: 50]
             if (toSave.getStockMovementList() != null && !toSave.getStockMovementList().isEmpty()) {
-                String insertMovementSql = """
-                INSERT INTO stock_movement (id, id_ingredient, quantity, type, unit, creation_datetime)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT (id) DO NOTHING
-            """;
-                try (PreparedStatement ps = conn.prepareStatement(insertMovementSql)) {
+                String moveSql = """
+            INSERT INTO stock_movement (id, id_ingredient, quantity, type, unit, creation_datetime)
+             VALUES (?, ?, ?, ?::movement_type, ?::unit_type, ?)
+            ON CONFLICT (id) DO NOTHING
+"""; // Contrainte du sujet respectée
+                try (PreparedStatement ps = conn.prepareStatement(moveSql)) {
                     for (StockMovement sm : toSave.getStockMovementList()) {
-                        ps.setObject(1, sm.getId());
+                        ps.setInt(1, sm.getId()); // ID obligatoire pour détecter le conflit
                         ps.setInt(2, ingredientId);
                         ps.setDouble(3, sm.getValue().getQuantity());
                         ps.setString(4, sm.getType().name());
-                        ps.setString(5, sm.getValue().getUnit());
+                        ps.setString(5, sm.getValue().getUnit().name());
                         ps.setTimestamp(6, Timestamp.from(sm.getCreationDatetime()));
                         ps.addBatch();
                     }
                     ps.executeBatch();
                 }
             }
-
             conn.commit();
-
             return toSave;
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur saveIngredient: " + e.getMessage(), e);
+            throw new RuntimeException("Erreur saveIngredient: " + e.getMessage());
         }
     }
 
-
+    //annexes
 
 }
