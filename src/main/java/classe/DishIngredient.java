@@ -57,7 +57,6 @@ public class DishIngredient {
         this.unit = unit;
     }
 
-    // ---- Méthodes utiles ----
     public Integer getIngredientId() {
         return ingredient != null ? ingredient.getId() : null;
     }

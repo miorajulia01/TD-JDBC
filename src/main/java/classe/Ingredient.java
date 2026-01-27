@@ -10,27 +10,23 @@ public class Ingredient {
     private String name;
     private CategoryEnum category;
     private Double price;
-    private List<StockMovement> stockMovementList = new ArrayList<>(); // Initialisation [cite: 30]
-
+    private List<StockMovement> stockMovementList = new ArrayList<>();
     public Ingredient() {}
 
-    // Méthode de calcul du stock à un instant T [cite: 31, 57]
     public StockValue getStockValueAt(Instant t) {
         double total = 0.0;
         for (StockMovement m : stockMovementList) {
-            // On vérifie que le mouvement a eu lieu avant ou à l'instant t [cite: 57]
             if (m.getCreationDatetime() != null && !m.getCreationDatetime().isAfter(t)) {
                 if (m.getType() == MovementTypeEnum.IN) {
-                    total += m.getValue().getQuantity(); // Entrée de stock
+                    total += m.getValue().getQuantity();
                 } else if (m.getType() == MovementTypeEnum.OUT) {
-                    total -= m.getValue().getQuantity(); // Sortie de stock
+                    total -= m.getValue().getQuantity();
                 }
             }
         }
-        return new StockValue(total, UnitType.KG); // Toutes les unités sont en KG pour le moment [cite: 45]
+        return new StockValue(total, UnitType.KG);
     }
 
-    // Getters et Setters corrigés
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -38,7 +34,7 @@ public class Ingredient {
     public void setName(String name) { this.name = name; }
 
     public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; } // Corrigé : paramètre bien assigné
+    public void setPrice(Double price) { this.price = price; }
 
     public List<StockMovement> getStockMovementList() { return stockMovementList; }
     public void setStockMovementList(List<StockMovement> list) { this.stockMovementList = list; }

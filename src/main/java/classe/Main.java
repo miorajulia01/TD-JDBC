@@ -10,7 +10,6 @@ public class Main {
 
         System.out.println("=== TESTS SIMPLES DataRetriever ===\n");
 
-        // --- Tes tests existants ---
         try {
             Dish dish = retriever.findDishById(1);
             if (dish != null) {
@@ -25,35 +24,26 @@ public class Main {
             System.out.println("✗ findDishById: " + e.getMessage());
         }
 
-        // --- NOUVEAUX TESTS : GESTION DE STOCKS (TD4) ---
         System.out.println("\n=== TESTS GESTION DE STOCKS (TD4) ===");
 
         try {
-            // 1. On récupère l'ingrédient 'Laitue' (ID 1)
             Ingredient laitue = new Ingredient();
             laitue.setId(1);
             laitue.setName("Laitue");
             laitue.setPrice(800.0);
             laitue.setCategory(CategoryEnum.VEGETABLE);
-
-            // 2. On définit les mouvements selon le sujet (Page 4)
             List<StockMovement> mouvements = new ArrayList<>();
 
-            // Stock Initial (Mouvement fictif ID 1 pour le test)
             mouvements.add(new StockMovement(1, new StockValue(5.0, UnitType.KG),
                     MovementTypeEnum.IN, Instant.parse("2024-01-01T08:00:00Z")));
-
-            // Sortie de stock (Mouvement ID 6 selon le tableau du sujet)
             mouvements.add(new StockMovement(6, new StockValue(0.2, UnitType.KG),
                     MovementTypeEnum.OUT, Instant.parse("2024-01-06T12:00:00Z")));
-
             laitue.setStockMovementList(mouvements);
 
-            // 3. Sauvegarde dans la base (avec le "ON CONFLICT DO NOTHING")
+
             retriever.saveIngredient(laitue);
             System.out.println("✓ Mouvements de stock sauvegardés pour la Laitue");
 
-            // 4. Vérification du calcul du stock à T = 2024-01-06 12:00
             Instant tTest = Instant.parse("2024-01-06T12:00:00Z");
             StockValue stockActuel = laitue.getStockValueAt(tTest);
 
@@ -71,6 +61,39 @@ public class Main {
             e.printStackTrace();
         }
 
+        //annexe//
+        Ingredient tomate = new Ingredient();
+        tomate.setId(2);
+        tomate.setName("Tomate");
+        tomate.setPrice(1200.0);
+        tomate.setCategory(CategoryEnum.VEGETABLE);
+
+        List<StockMovement> moveTomate = new ArrayList<>();
+        moveTomate.add(new StockMovement(10, new StockValue(10.0, UnitType.KG),
+                MovementTypeEnum.IN, Instant.now()));
+        tomate.setStockMovementList(moveTomate);
+
+        retriever.saveIngredient(tomate);
+        System.out.println("✓ Stock de Tomates mis à jour (10kg dispo)");
+        try {
+            System.out.println("--- Test Sauvegarde Commande ---");
+            Dish salade = retriever.findDishById(1);
+            Order nlleCommande = new Order();
+            nlleCommande.setReference("ORD00001");
+            nlleCommande.getDishOrders().add(new DishOrder(salade, 2));
+
+            retriever.saveOrder(nlleCommande);
+            System.out.println("✓ Commande ORD00001 enregistrée avec succès !");
+
+            Order found = retriever.findOrderByReference("ORD00001");
+            System.out.println("✓ Recherche OK : Commande ID " + found.getId());
+
+        } catch (RuntimeException e) {
+            System.err.println("Erreur : " + e.getMessage());
+        }
         System.out.println("\n=== FIN TESTS ===");
     }
+
+
+
 }

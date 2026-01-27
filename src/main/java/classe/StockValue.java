@@ -2,7 +2,7 @@ package classe;
 
 public class StockValue {
     private double quantity;
-    private UnitType unit; // Corrigé : Utilise l'Enum UnitType
+    private UnitType unit;
 
     public StockValue(double quantity, UnitType unit) {
         this.quantity = quantity;
