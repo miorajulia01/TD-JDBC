@@ -15,7 +15,6 @@ public enum UnitType {
         return label;
     }
 
-
     public static UnitType fromString(String text) {
         if (text != null) {
             for (UnitType unit : UnitType.values()) {

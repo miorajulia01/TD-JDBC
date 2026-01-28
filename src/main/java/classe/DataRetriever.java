@@ -379,11 +379,13 @@ public class DataRetriever {
 
                     for (DishIngredient di : fullDish.getDishIngredients()) {
                         Ingredient ing = di.getIngredient();
+                        double qteRequiseBrute = di.getQuantityRequired() * doReq.getQuantity();
+                        double qteRequiseEnKG = Convertion.convertToKG(ing.getName(), qteRequiseBrute, di.getUnit());
                         double stockDisponible = ing.getStockValueAt(Instant.now()).getQuantity();
-                        double besoinTotal = di.getQuantityRequired() * doReq.getQuantity();
-                        if (stockDisponible < besoinTotal) {
+
+                        if (stockDisponible < qteRequiseEnKG) {
                             conn.rollback();
-                            throw new RuntimeException("L'ingrédient '" + ing.getName() + "' n'est pas suffisant (Dispo: " + stockDisponible + ", Besoin: " + besoinTotal + ")");
+                            throw new RuntimeException("Stock insuffisant pour " + ing.getName());
                         }
                     }
                 }
@@ -393,9 +395,7 @@ public class DataRetriever {
                     ps.setString(1, orderToSave.getReference());
                     ps.setTimestamp(2, Timestamp.from(Instant.now()));
                     ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        orderToSave.setId(rs.getInt(1));
-                    }
+                    if (rs.next()) orderToSave.setId(rs.getInt(1));
                 }
 
                 String sqlDetail = "INSERT INTO dish_order (id_order, id_dish, quantity) VALUES (?, ?, ?)";
@@ -408,14 +408,16 @@ public class DataRetriever {
                     }
                     ps.executeBatch();
                 }
+
                 conn.commit();
                 return orderToSave;
+
             } catch (Exception e) {
                 conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur JDBC saveOrder: " + e.getMessage());
+            throw new RuntimeException("Erreur JDBC : " + e.getMessage());
         }
     }
 
