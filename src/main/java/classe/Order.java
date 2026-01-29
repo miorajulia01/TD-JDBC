@@ -3,7 +3,7 @@ package classe;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
 
 
 public class Order {
@@ -63,8 +63,19 @@ public class Order {
                 .sum();
     }
 
-
     public Double getTotalAmountWithVAT() {
         return getTotalAmountWithoutVAT() * 1.20;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Order order)) return false;
+        return Objects.equals(id, order.id) && Objects.equals(reference, order.reference) && Objects.equals(creationDatetime, order.creationDatetime) && Objects.equals(dishOrders, order.dishOrders);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, reference, creationDatetime, dishOrders);
+    }
 }
+

@@ -34,4 +34,13 @@ public class DishOrder {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "DishOrder{" +
+                "id=" + id +
+                ", dish=" + dish +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

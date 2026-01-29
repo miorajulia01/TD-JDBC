@@ -1,6 +1,7 @@
 package classe;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class StockMovement {
     private Integer id;
@@ -32,5 +33,24 @@ public class StockMovement {
         this.creationDatetime = creationDatetime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof StockMovement that)) return false;
+        return Objects.equals(id, that.id)  && type == that.type && Objects.equals(creationDatetime, that.creationDatetime) && Objects.equals(value, that.value);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, creationDatetime, value);
+    }
+
+    @Override
+    public String toString() {
+        return "StockMovement{" +
+                "id=" + id +
+                ", type=" + type +
+                ", creationDatetime=" + creationDatetime +
+                ", value=" + value +
+                '}';
+    }
 }
