@@ -23,6 +23,16 @@ public class Order {
         }
     }
 
+    private TableOrder table;
+
+    public TableOrder getTableOrder() {
+        return table;
+    }
+
+    public void setTableOrder(TableOrder table) {
+        this.table = table;
+    }
+
     public Integer getId() {
 
         return id;

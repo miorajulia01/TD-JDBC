@@ -371,56 +371,72 @@ public class DataRetriever {
 
     //annexes //
     public Order saveOrder(Order orderToSave) {
+        DBConnection dbConnection = new DBConnection();
         try (Connection conn = dbConnection.getConnection()) {
             conn.setAutoCommit(false);
+
             try {
-                for (DishOrder doReq : orderToSave.getDishOrders()) {
-                    Dish fullDish = findDishById(doReq.getDish().getId());
+                TableOrder tableInfo = orderToSave.getTableOrder();
+                Instant creationTime = orderToSave.getCreationDatetime();
 
-                    for (DishIngredient di : fullDish.getDishIngredients()) {
-                        Ingredient ing = di.getIngredient();
-                        double qteRequiseBrute = di.getQuantityRequired() * doReq.getQuantity();
-                        double qteRequiseEnKG = Convertion.convertToKG(ing.getName(), qteRequiseBrute, di.getUnit());
-                        double stockDisponible = ing.getStockValueAt(Instant.now()).getQuantity();
+                if (!isTableAvailable(conn, tableInfo.getTable().getId(), creationTime)) {
 
-                        if (stockDisponible < qteRequiseEnKG) {
-                            conn.rollback();
-                            throw new RuntimeException("Stock insuffisant pour " + ing.getName());
-                        }
+                    List<Integer> libres = getAvailableTableNumbers(conn, creationTime);
+
+                    String message;
+                    if (libres.isEmpty()) {
+                        message = "aucune table n'est disponible";
+                    } else {
+                        message = "les tables numéro " + libres +
+                                " sont actuellement libres mais pas la numéro " +
+                                tableInfo.getTable().getNumber();
                     }
+
+                    conn.rollback();
+                    throw new RuntimeException(message);
                 }
 
-                String sqlOrder = "INSERT INTO \"order\" (reference, creation_datetime) VALUES (?, ?) RETURNING id";
-                try (PreparedStatement ps = conn.prepareStatement(sqlOrder)) {
+                String sql = "INSERT INTO \"order\" (reference, creation_datetime, id_table) VALUES (?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, orderToSave.getReference());
-                    ps.setTimestamp(2, Timestamp.from(Instant.now()));
-                    ResultSet rs = ps.executeQuery();
-                    if (rs.next()) orderToSave.setId(rs.getInt(1));
-                }
-
-                String sqlDetail = "INSERT INTO dish_order (id_order, id_dish, quantity) VALUES (?, ?, ?)";
-                try (PreparedStatement ps = conn.prepareStatement(sqlDetail)) {
-                    for (DishOrder doReq : orderToSave.getDishOrders()) {
-                        ps.setInt(1, orderToSave.getId());
-                        ps.setInt(2, doReq.getDish().getId());
-                        ps.setInt(3, doReq.getQuantity());
-                        ps.addBatch();
-                    }
-                    ps.executeBatch();
+                    ps.setTimestamp(2, Timestamp.from(creationTime));
+                    ps.setInt(3, tableInfo.getTable().getId());
+                    ps.executeUpdate();
                 }
 
                 conn.commit();
                 return orderToSave;
-
             } catch (Exception e) {
                 conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur JDBC : " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
+    private boolean isTableAvailable(Connection conn, int idTable, Instant t) throws SQLException {
+        String sql = "SELECT count(*) FROM table_order WHERE id_table = ? AND ? BETWEEN arrival_datetime AND departure_datetime";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idTable);
+            ps.setTimestamp(2, Timestamp.from(t));
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) == 0;
+        }
+    }
+
+    private List<Integer> getAvailableTableNumbers(Connection conn, Instant t) throws SQLException {
+        List<Integer> libres = new ArrayList<>();
+        String sql = "SELECT number FROM \"table\" t WHERE NOT EXISTS (" +
+                "SELECT 1 FROM table_order to2 WHERE to2.id_table = t.id " +
+                "AND ? BETWEEN arrival_datetime AND departure_datetime)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.from(t));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) libres.add(rs.getInt("number"));
+        }
+        return libres;
+    }
 
     public Order findOrderByReference(String reference) {
         try (Connection conn = dbConnection.getConnection()) {

@@ -68,3 +68,19 @@ CREATE TABLE dish_order (
     id_dish INTEGER NOT NULL REFERENCES dish(id),
     quantity INTEGER NOT NULL CHECK (quantity > 0)
 );
+
+--évaluation--
+CREATE TABLE "table" (
+    id SERIAL PRIMARY KEY,
+    number INTEGER NOT NULL UNIQUE
+);
+
+
+CREATE TABLE table_order (
+    id SERIAL PRIMARY KEY,
+    id_table INTEGER REFERENCES "table"(id),
+    arrival_datetime TIMESTAMP NOT NULL,
+    departure_datetime TIMESTAMP NOT NULL
+);
+
+ALTER TABLE "order" ADD COLUMN id_table INTEGER REFERENCES "table"(id);

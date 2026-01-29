@@ -96,7 +96,7 @@ public class Main {
 
         //bonus
         Map<String, Double> stocks = new HashMap<>();
-        stocks.put("Laitue", 5.0);   // Stock en KG
+        stocks.put("Laitue", 5.0);
         stocks.put("Tomate", 4.0);
         stocks.put("Poulet", 10.0);
         stocks.put("Chocolat", 3.0);
@@ -119,6 +119,22 @@ public class Main {
         double stockFinalBeurre = stocks.get("Beurre") - sortieBeurreKG;
         System.out.println("Beurre : Sortie 0.2 KG | Stock Final : " + stockFinalBeurre + " KG (Attendu: 2.3)");
         System.out.println("\n=== FIN TESTS ===");
+
+      //évaluation
+        Table table1 = new Table(1, 1);
+        TableOrder occupation = new TableOrder(table1, Instant.now(), Instant.now().plusSeconds(7200));
+        Order maCommande = new Order();
+        maCommande.setReference("TEST-EXAM");
+        maCommande.setCreationDatetime(Instant.now());
+        maCommande.setTableOrder(occupation); // Liaison cruciale
+
+        try {
+            System.out.println("Tentative de sauvegarde de la commande...");
+            retriever.saveOrder(maCommande);
+            System.out.println("Succès !");
+        } catch (RuntimeException e) {
+            System.err.println("ERREUR ATTENDUE : " + e.getMessage());
+        }
     }
 
 

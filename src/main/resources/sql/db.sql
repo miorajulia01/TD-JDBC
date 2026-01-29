@@ -20,6 +20,7 @@ ALTER TABLE dish_ingredient OWNER TO mini_dish_db_manager;
 ALTER TABLE stock_movement  OWNER TO mini_dish_db_manager;
 ALTER TABLE "order"  OWNER TO mini_dish_db_manager;
 ALTER TABLE dish_order  OWNER TO mini_dish_db_manager;
-
-
 ALTER SEQUENCE dish_id_seq OWNER TO mini_dish_db_manager;
+--évaluation
+ALTER TABLE "table"  OWNER TO mini_dish_db_manager;
+ALTER TABLE table_order  OWNER TO mini_dish_db_manager;

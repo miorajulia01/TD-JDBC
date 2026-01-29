@@ -42,3 +42,5 @@ INSERT INTO stock_movement (id, id_ingredient, quantity, type, unit, creation_da
 (9, 5, 2.5, 'IN', 'KG', '2024-01-05 10:00:00'),
 (10, 5, 0.2, 'OUT', 'KG', '2024-01-06 14:00:00');
 
+--évaluation
+INSERT INTO "table" (number) VALUES (1), (2), (3);
