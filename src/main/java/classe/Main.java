@@ -118,15 +118,15 @@ public class Main {
         double sortieBeurreKG = Convertion.convertToKG("Beurre", sortieBeurreL, UnitType.L);
         double stockFinalBeurre = stocks.get("Beurre") - sortieBeurreKG;
         System.out.println("Beurre : Sortie 0.2 KG | Stock Final : " + stockFinalBeurre + " KG (Attendu: 2.3)");
-        System.out.println("\n=== FIN TESTS ===");
 
       //évaluation
+        System.out.println("==evaluation==");
         Table table1 = new Table(1, 1);
         TableOrder occupation = new TableOrder(table1, Instant.now(), Instant.now().plusSeconds(7200));
         Order maCommande = new Order();
         maCommande.setReference("TEST-EXAM");
         maCommande.setCreationDatetime(Instant.now());
-        maCommande.setTableOrder(occupation); // Liaison cruciale
+        maCommande.setTableOrder(occupation);
 
         try {
             System.out.println("Tentative de sauvegarde de la commande...");
@@ -135,6 +135,8 @@ public class Main {
         } catch (RuntimeException e) {
             System.err.println("ERREUR ATTENDUE : " + e.getMessage());
         }
+
+        System.out.println("\n=== FIN TESTS ===");
     }
 
 

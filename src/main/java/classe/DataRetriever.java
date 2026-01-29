@@ -379,8 +379,11 @@ public class DataRetriever {
                 TableOrder tableInfo = orderToSave.getTableOrder();
                 Instant creationTime = orderToSave.getCreationDatetime();
 
-                if (!isTableAvailable(conn, tableInfo.getTable().getId(), creationTime)) {
+                if (orderToSave.getTableOrder() == null) {
+                    throw new RuntimeException("la table n'est pas fournie"); // Libellé suggéré par le sujet
+                }
 
+                if (!isTableAvailable(conn, tableInfo.getTable().getId(), creationTime)) {
                     List<Integer> libres = getAvailableTableNumbers(conn, creationTime);
 
                     String message;

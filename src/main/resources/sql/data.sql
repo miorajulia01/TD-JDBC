@@ -44,3 +44,5 @@ INSERT INTO stock_movement (id, id_ingredient, quantity, type, unit, creation_da
 
 --évaluation
 INSERT INTO "table" (number) VALUES (1), (2), (3);
+INSERT INTO table_order (id_table, arrival_datetime, departure_datetime)
+VALUES (1, '2026-01-29 10:00:00', '2026-01-29 13:00:00');
