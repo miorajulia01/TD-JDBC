@@ -120,22 +120,37 @@ public class Main {
         System.out.println("Beurre : Sortie 0.2 KG | Stock Final : " + stockFinalBeurre + " KG (Attendu: 2.3)");
 
       //évaluation
-        System.out.println("==evaluation==");
         Table table1 = new Table(1, 1);
-        TableOrder occupation = new TableOrder(table1, Instant.now(), Instant.now().plusSeconds(7200));
-        Order maCommande = new Order();
-        maCommande.setReference("TEST-EXAM");
-        maCommande.setCreationDatetime(Instant.now());
-        maCommande.setTableOrder(occupation);
+        TableOrder occupation1 = new TableOrder(table1, Instant.now(), Instant.now().plusSeconds(7200));
 
+        Order commandeErreur = new Order();
+        commandeErreur.setReference("REF-ERR-001");
+        commandeErreur.setCreationDatetime(Instant.now());
+        commandeErreur.setTableOrder(occupation1);
+
+        System.out.println("\n1. Test de conflit (Table 1) :");
         try {
-            System.out.println("Tentative de sauvegarde de la commande...");
-            retriever.saveOrder(maCommande);
-            System.out.println("Succès !");
+            retriever.saveOrder(commandeErreur);
         } catch (RuntimeException e) {
-            System.err.println("ERREUR ATTENDUE : " + e.getMessage());
+            System.out.println("RÉSULTAT ATTENDU : " + e.getMessage());
         }
 
+
+        Table table3 = new Table(3, 3);
+        TableOrder occupation3 = new TableOrder(table3, Instant.now(), Instant.now().plusSeconds(3600));
+
+        Order commandeSucces = new Order();
+        commandeSucces.setReference("REF-OK-2026");
+        commandeSucces.setCreationDatetime(Instant.now());
+        commandeSucces.setTableOrder(occupation3);
+
+        System.out.println("\n2. Test de succès (Table 3) :");
+        try {
+            Order result = retriever.saveOrder(commandeSucces);
+            System.out.println("RÉSULTAT ATTENDU : Succès ! Commande enregistrée avec l'ID : " + result.getId());
+        } catch (RuntimeException e) {
+            System.err.println("ERREUR : " + e.getMessage());
+        }
         System.out.println("\n=== FIN TESTS ===");
     }
 
