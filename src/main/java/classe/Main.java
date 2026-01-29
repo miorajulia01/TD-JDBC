@@ -102,23 +102,23 @@ public class Main {
         stocks.put("Chocolat", 3.0);
         stocks.put("Beurre", 2.5);
 
-//        System.out.println("=== VERIFICATION DES SORTIES  ===");
-//        double sortieTomatePCS = 5.0;
-//
-//        double sortieTomateKG = Convertion.convertToKG("Tomate", sortieTomatePCS, UnitType.PCS);
-//        double stockFinalTomate = stocks.get("Tomate") - sortieTomateKG;
-//        System.out.println("Tomate : Sortie 0.5 KG | Stock Final : " + stockFinalTomate + " KG (Attendu: 3.5)");
-//
-//        double sortieChocoL = 1.0;
-//        double sortieChocoKG = Convertion.convertToKG("Chocolat", sortieChocoL, UnitType.L);
-//        double stockFinalChoco = stocks.get("Chocolat") - sortieChocoKG;
-//        System.out.println("Chocolat : Sortie 0.4 KG | Stock Final : " + stockFinalChoco + " KG (Attendu: 2.6)");
-//
-//        double sortieBeurreL = 1.0;
-//        double sortieBeurreKG = Convertion.convertToKG("Beurre", sortieBeurreL, UnitType.L);
-//        double stockFinalBeurre = stocks.get("Beurre") - sortieBeurreKG;
-//        System.out.println("Beurre : Sortie 0.2 KG | Stock Final : " + stockFinalBeurre + " KG (Attendu: 2.3)");
-//        System.out.println("\n=== FIN TESTS ===");
+        System.out.println("=== VERIFICATION DES SORTIES  ===");
+        double sortieTomatePCS = 5.0;
+
+        double sortieTomateKG = Convertion.convertToKG("Tomate", sortieTomatePCS, UnitType.PCS);
+        double stockFinalTomate = stocks.get("Tomate") - sortieTomateKG;
+        System.out.println("Tomate : Sortie 0.5 KG | Stock Final : " + stockFinalTomate + " KG (Attendu: 3.5)");
+
+        double sortieChocoL = 1.0;
+        double sortieChocoKG = Convertion.convertToKG("Chocolat", sortieChocoL, UnitType.L);
+        double stockFinalChoco = stocks.get("Chocolat") - sortieChocoKG;
+        System.out.println("Chocolat : Sortie 0.4 KG | Stock Final : " + stockFinalChoco + " KG (Attendu: 2.6)");
+
+        double sortieBeurreL = 1.0;
+        double sortieBeurreKG = Convertion.convertToKG("Beurre", sortieBeurreL, UnitType.L);
+        double stockFinalBeurre = stocks.get("Beurre") - sortieBeurreKG;
+        System.out.println("Beurre : Sortie 0.2 KG | Stock Final : " + stockFinalBeurre + " KG (Attendu: 2.3)");
+        System.out.println("\n=== FIN TESTS ===");
     }
 
 

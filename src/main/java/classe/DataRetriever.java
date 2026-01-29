@@ -372,42 +372,34 @@ public class DataRetriever {
     //annexes //
     public Order saveOrder(Order orderToSave) {
         try (Connection conn = dbConnection.getConnection()) {
-            conn.setAutoCommit(false); // On démarre une transaction pour tout valider d'un coup
-
+            conn.setAutoCommit(false);
             try {
-                // 1. VÉRIFICATION DES STOCKS
-                for (DishOrder dishOrd : orderToSave.getDishOrders()) {
-                    // On récupère le plat complet pour avoir la liste des ingrédients requis
-                    Dish fullDish = findDishById(dishOrd.getDish().getId());
+                for (DishOrder doReq : orderToSave.getDishOrders()) {
+                    Dish fullDish = findDishById(doReq.getDish().getId());
 
                     for (DishIngredient di : fullDish.getDishIngredients()) {
                         Ingredient ing = di.getIngredient();
-                        // On calcule le stock à l'instant présent
-                        double dispo = ing.getStockValueAt(Instant.now()).getQuantity();
-                        // Quantité nécessaire = quantité par plat * nombre de plats commandés
-                        double besoin = di.getQuantityRequired() * dishOrd.getQuantity();
+                        double qteRequiseBrute = di.getQuantityRequired() * doReq.getQuantity();
+                        double qteRequiseEnKG = Convertion.convertToKG(ing.getName(), qteRequiseBrute, di.getUnit());
+                        double stockDisponible = ing.getStockValueAt(Instant.now()).getQuantity();
 
-                        if (dispo < besoin) {
-                            conn.rollback(); // On annule tout
-                            throw new RuntimeException("Stock insuffisant pour l'ingrédient : " + ing.getName());
+                        if (stockDisponible < qteRequiseEnKG) {
+                            conn.rollback();
+                            throw new RuntimeException("Stock insuffisant pour " + ing.getName());
                         }
                     }
                 }
 
-                // 2. INSERTION DE LA COMMANDE ("order" entre guillemets)
                 String sqlOrder = "INSERT INTO \"order\" (reference, creation_datetime) VALUES (?, ?) RETURNING id";
                 try (PreparedStatement ps = conn.prepareStatement(sqlOrder)) {
                     ps.setString(1, orderToSave.getReference());
                     ps.setTimestamp(2, Timestamp.from(Instant.now()));
                     ResultSet rs = ps.executeQuery();
-                    if (rs.next()) {
-                        orderToSave.setId(rs.getInt(1));
-                    }
+                    if (rs.next()) orderToSave.setId(rs.getInt(1));
                 }
 
-                // 3. INSERTION DES PLATS DE LA COMMANDE
-                String sqlDishOrder = "INSERT INTO dish_order (id_order, id_dish, quantity) VALUES (?, ?, ?)";
-                try (PreparedStatement ps = conn.prepareStatement(sqlDishOrder)) {
+                String sqlDetail = "INSERT INTO dish_order (id_order, id_dish, quantity) VALUES (?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sqlDetail)) {
                     for (DishOrder doReq : orderToSave.getDishOrders()) {
                         ps.setInt(1, orderToSave.getId());
                         ps.setInt(2, doReq.getDish().getId());
@@ -417,17 +409,18 @@ public class DataRetriever {
                     ps.executeBatch();
                 }
 
-                conn.commit(); // On valide tout en base de données
+                conn.commit();
                 return orderToSave;
 
             } catch (Exception e) {
-                conn.rollback(); // En cas d'erreur ou manque de stock, on annule tout
+                conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur JDBC saveOrder : " + e.getMessage());
+            throw new RuntimeException("Erreur JDBC : " + e.getMessage());
         }
     }
+
 
     public Order findOrderByReference(String reference) {
         try (Connection conn = dbConnection.getConnection()) {
