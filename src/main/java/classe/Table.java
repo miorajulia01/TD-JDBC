@@ -8,7 +8,7 @@ public class Table {
     private int number;
     private List<Order> orders;
 
-
+public Table() {}
 
     public Table(Integer id, int number) {
         this.id = id;
